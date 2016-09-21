@@ -5,8 +5,8 @@ angular.module('libraryApp')
   remove $http from the controller
   add BookService as a dependency
 *******************************************/
-BooksShowController.$inject=['$routeParams', '$location', '$http'];
-function BooksShowController($routeParams,    $location,   $http) {
+BooksShowController.$inject=['$routeParams', '$location', 'BookService'];
+function BooksShowController($routeParams,    $location,   BookService) {
   var vm = this;
   var bookId = $routeParams.id;
   // exports
@@ -26,10 +26,10 @@ function BooksShowController($routeParams,    $location,   $http) {
       BookService.get(id).then()
     **************************************/
 
-    $http({
-      method: 'GET',
-      url: 'https://super-crud.herokuapp.com/books/'+id
-    }).then(onBookShowSuccess, onError);
+      BookService.get(id).then(function(data){
+        console.log("here's the one book from BooksShowController", data);
+        vm.book = data;
+      });
 
 
     function onBookShowSuccess(response){
@@ -69,14 +69,14 @@ function BooksShowController($routeParams,    $location,   $http) {
       BookService.remove(id).then()
     **************************************/
 
-      $http({
-        method: 'DELETE',
-        url: 'https://super-crud.herokuapp.com/books/' + book._id,
-      }).then(onBookDeleteSuccess);
+      BookService.remove(bookId).then(onBookDeleteSuccess, onError);
 
       function onBookDeleteSuccess(response){
-        console.log('book delete response data:', response.data);
+        console.log('book delete response data:', bookId, ':', response.data);
         $location.path('/');
       }
+      function onError() {
+      console.log("error updating the book");
+    }
     }
 }
